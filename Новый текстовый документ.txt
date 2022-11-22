@@ -1,0 +1,136 @@
+using System;
+
+namespace Task_6
+{
+    class Program
+    {
+        static void WriteMatrix(int[,] x)
+        {
+            for (int i = 0; i < x.GetLength(0); i++)
+            {
+                for (int j = 0; j < x.GetLength(1); j++)
+                {
+                    Console.Write("{0, -5}", x[i,j]);
+                }
+                Console.WriteLine();
+            }
+        }
+
+        static int FindMaxOnMain(int[,] x)
+        {
+            int max = x[0, 0];
+            int i_max = 0;
+
+            for (int i = 0; i < x.GetLength(0); i++)
+            {
+                if (x[i, i] > max)
+                {
+                    max = x[i, i];
+                    i_max = i;
+                }
+            }
+
+            return i_max;
+        }
+        static int FindMaxInFirst(int[,] x)
+        {
+            int max = x[0, 0];
+            int j_max = 0;
+
+            for (int j = 0; j < x.GetLength(1); j++)
+            {
+                if (x[0, j] > max)
+                {
+                    max=x[0, j];
+                    j_max = j;
+                }
+            }
+
+            return j_max;
+        }
+
+        delegate int ForFindMax(int[,] x);
+
+        static int SearchingMax(ForFindMax f, int[,] x)
+        {
+            return f(x);
+        }
+
+        static int[,] MatrixChange(int[,] x)
+        {
+            int max_onMain = SearchingMax(FindMaxOnMain, x);
+            int max_onFirst = SearchingMax(FindMaxInFirst, x);
+
+            if (max_onMain != max_onFirst)
+            {
+                int[] ColumnForChanging = new int[x.GetLength(0)];
+                int mass_i = 0;
+
+                for (int i = 0; i < ColumnForChanging.Length; i++)
+                {
+                    ColumnForChanging[i] = x[i, max_onFirst];
+                }
+
+                for (int i = 0; i < x.GetLength(0); i++)
+                {
+                    x[i, max_onFirst] = x[i, max_onMain];
+                }
+
+                for (int i = 0; i < x.GetLength(0); i++)
+                {
+                    x[i, max_onMain] = ColumnForChanging[mass_i];
+                    mass_i++;
+                }
+
+                return x;
+            }
+            else return x;
+        }
+
+        static void Main(string[] args)
+        {
+            int for_choice = 0;
+            Console.WriteLine("Какие числа в матрице? Случайные - 1, Заданные мной - 2");
+            Int32.TryParse(Console.ReadLine(), out for_choice);
+            int[,] A = new int[4, 4];
+
+            Random random = new Random();
+
+            if (for_choice == 1)
+            {
+                for (int i = 0; i < A.GetLength(0); i++)
+                {
+                    for (int j = 0; j < A.GetLength(1); j++)
+                    {
+                        A[i, j] = random.Next(-10, 40);
+                    }
+                }
+            }
+            else if (for_choice == 2)
+            {
+                A = new int[4, 4]
+                {
+                  {22,  2, 5, 190 },
+                  {7,  110, 5, 44 },
+                  {-1, -1, 2, 11 },
+                  {4,   1,   42,  9 }
+                };
+            }
+
+            Console.WriteLine("Исходная матрица: ");
+            WriteMatrix(A);
+
+            int max_inFirst = SearchingMax(FindMaxInFirst, A);
+            int max_onMain = SearchingMax(FindMaxOnMain, A);
+
+            Console.WriteLine($"Max in First = {max_inFirst}, max on main = {max_onMain} \n");
+
+            A = MatrixChange(A);
+
+            Console.WriteLine("Итоговая матрица: ");
+            WriteMatrix(A);
+
+        }
+
+    }
+}
